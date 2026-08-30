@@ -42,22 +42,22 @@ export function ProjectDetail() {
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-lg border border-steel-200 p-6 mb-6">
-        <div className="flex items-start justify-between flex-wrap gap-4">
+      <div className="bg-white rounded-lg border border-steel-200 p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold text-navy-900">{p.project}</h1>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-lg sm:text-xl font-semibold text-navy-900">{p.project}</h1>
               <StatusBadge status={p.status} />
             </div>
             <p className="text-sm text-steel-600 mt-1">{p.customer}</p>
-            <div className="flex flex-wrap gap-4 mt-3 text-sm text-steel-500">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-1 sm:gap-4 mt-3 text-sm text-steel-500">
               <span className="flex items-center gap-1"><MapPin size={14} /> {p.location}</span>
               <span className="flex items-center gap-1"><Calendar size={14} /> {formatDate(p.startDate)} — {formatDate(p.targetCompletion)}</span>
               <span className="flex items-center gap-1"><User size={14} /> {p.projectManager}</span>
             </div>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-navy-900">{formatCurrency(p.value)}</p>
+          <div className="sm:text-right">
+            <p className="text-xl sm:text-2xl font-bold text-navy-900">{formatCurrency(p.value)}</p>
             <div className="flex items-center gap-2 mt-2 justify-end">
               <ProgressBar value={p.progress} className="w-32" />
               <span className="text-sm font-medium text-steel-600">{p.progress}%</span>

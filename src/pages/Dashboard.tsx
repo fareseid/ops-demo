@@ -34,7 +34,7 @@ export function Dashboard() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 mb-8">
         <KPICard label="Active Projects" value="8" icon={<FolderKanban size={18} />} />
         <KPICard label="Quotations Pending" value="6" icon={<FileText size={18} />} />
         <KPICard label="Quotation Value" value={formatCurrency(1284500)} icon={<Receipt size={18} />} />
@@ -44,7 +44,7 @@ export function Dashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex gap-3 mb-8">
+      <div className="flex gap-3 mb-8 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0 sm:overflow-visible sm:flex-wrap">
         {[
           { label: 'New Request', icon: Plus, path: '/requests' },
           { label: 'Create Quotation', icon: FileText, path: '/quotations' },
@@ -54,7 +54,7 @@ export function Dashboard() {
           <button
             key={a.label}
             onClick={() => navigate(a.path)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-steel-200 rounded-lg text-sm font-medium text-navy-800 hover:bg-steel-50 hover:border-steel-300 transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white border border-steel-200 rounded-lg text-sm font-medium text-navy-800 hover:bg-steel-50 hover:border-steel-300 transition-colors shadow-sm whitespace-nowrap flex-shrink-0"
           >
             <a.icon size={15} /> {a.label}
           </button>

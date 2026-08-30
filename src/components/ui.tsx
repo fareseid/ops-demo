@@ -71,14 +71,14 @@ export function StatusBadge({ status, className }: { status: string; className?:
 // KPI Card
 export function KPICard({ label, value, sub, icon }: { label: string; value: string | number; sub?: string; icon?: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-lg border border-steel-200 p-5 hover:border-steel-300 transition-colors">
+    <div className="bg-white rounded-lg border border-steel-200 p-3 sm:p-5 hover:border-steel-300 transition-colors">
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm text-steel-500 font-medium">{label}</p>
-          <p className="text-2xl font-semibold text-navy-900 mt-1">{value}</p>
+        <div className="min-w-0">
+          <p className="text-xs sm:text-sm text-steel-500 font-medium truncate">{label}</p>
+          <p className="text-lg sm:text-2xl font-semibold text-navy-900 mt-0.5 sm:mt-1 truncate">{value}</p>
           {sub && <p className="text-xs text-steel-400 mt-1">{sub}</p>}
         </div>
-        {icon && <div className="text-steel-400">{icon}</div>}
+        {icon && <div className="text-steel-400 hidden sm:block">{icon}</div>}
       </div>
     </div>
   );
@@ -97,10 +97,10 @@ export function Avatar({ name, size = 'sm' }: { name: string; size?: 'sm' | 'md'
 // Page Header
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between mb-6">
+    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5 sm:mb-6">
       <div>
-        <h1 className="text-xl font-semibold text-navy-900">{title}</h1>
-        {subtitle && <p className="text-sm text-steel-500 mt-0.5">{subtitle}</p>}
+        <h1 className="text-lg sm:text-xl font-semibold text-navy-900">{title}</h1>
+        {subtitle && <p className="text-xs sm:text-sm text-steel-500 mt-0.5">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>
@@ -144,16 +144,16 @@ export function Modal({ open, onClose, title, children, width = 'max-w-lg' }: {
 }) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
       <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-      <div className={cn('relative bg-white rounded-xl shadow-2xl w-full', width)}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-steel-200">
-          <h2 className="text-base font-semibold text-navy-900">{title}</h2>
+      <div className={cn('relative bg-white w-full shadow-2xl rounded-t-xl sm:rounded-xl max-h-[90vh] sm:max-h-[85vh] flex flex-col', width)}>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-steel-200 flex-shrink-0">
+          <h2 className="text-sm sm:text-base font-semibold text-navy-900">{title}</h2>
           <button onClick={onClose} className="text-steel-400 hover:text-steel-600 p-1 rounded-lg hover:bg-steel-100">
             <X size={18} />
           </button>
         </div>
-        <div className="px-6 py-4">{children}</div>
+        <div className="px-4 sm:px-6 py-4 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
@@ -202,13 +202,13 @@ export function ProgressBar({ value, className }: { value: number; className?: s
 // Tabs
 export function Tabs({ tabs, active, onChange }: { tabs: string[]; active: string; onChange: (t: string) => void }) {
   return (
-    <div className="flex border-b border-steel-200 gap-0">
+    <div className="flex border-b border-steel-200 gap-0 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
       {tabs.map(t => (
         <button
           key={t}
           onClick={() => onChange(t)}
           className={cn(
-            'px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors',
+            'px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap',
             active === t ? 'border-navy-800 text-navy-900' : 'border-transparent text-steel-500 hover:text-steel-700 hover:border-steel-300'
           )}
         >

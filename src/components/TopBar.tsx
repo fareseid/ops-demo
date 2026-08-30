@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, ChevronDown } from 'lucide-react';
+import { Search, Bell, Menu, X } from 'lucide-react';
 import { Avatar } from './ui';
 import { notifications } from '@/data/mock';
 import { cn } from '@/lib/utils';
 
-// Global search data
 const searchIndex = [
   { label: 'Copperbelt Mining Services', type: 'Customer', path: '/requests' },
   { label: 'Kafue Manufacturing Ltd', type: 'Customer', path: '/requests' },
@@ -27,8 +26,9 @@ const searchIndex = [
   { label: 'Transport & Labour Hire', type: 'Project', path: '/projects/PRJ-2026-014' },
 ];
 
-export function TopBar() {
+export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
   const navigate = useNavigate();
@@ -48,10 +48,22 @@ export function TopBar() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  const handleSelect = (path: string) => {
+    navigate(path);
+    setSearchOpen(false);
+    setMobileSearchOpen(false);
+    setSearchQuery('');
+  };
+
   return (
-    <header className="h-14 bg-white border-b border-steel-200 flex items-center px-6 gap-4 sticky top-0 z-30">
-      {/* Search */}
-      <div ref={searchRef} className="relative flex-1 max-w-md">
+    <header className="h-14 bg-white border-b border-steel-200 flex items-center px-3 sm:px-6 gap-2 sm:gap-4 sticky top-0 z-30">
+      {/* Hamburger */}
+      <button onClick={onMenuClick} className="lg:hidden p-2 -ml-1 rounded-lg hover:bg-steel-50 text-steel-500">
+        <Menu size={20} />
+      </button>
+
+      {/* Desktop search */}
+      <div ref={searchRef} className="relative flex-1 max-w-md hidden sm:block">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel-400" />
         <input
           type="text"
@@ -67,7 +79,7 @@ export function TopBar() {
               <button
                 key={i}
                 className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-steel-50 text-left"
-                onClick={() => { navigate(r.path); setSearchOpen(false); setSearchQuery(''); }}
+                onClick={() => handleSelect(r.path)}
               >
                 <span className="text-navy-900 font-medium">{r.label}</span>
                 <span className="text-xs text-steel-400">{r.type}</span>
@@ -77,7 +89,15 @@ export function TopBar() {
         )}
       </div>
 
-      <div className="flex items-center gap-3 ml-auto">
+      {/* Mobile: spacer */}
+      <div className="flex-1 sm:hidden" />
+
+      <div className="flex items-center gap-1 sm:gap-3 ml-auto">
+        {/* Mobile search toggle */}
+        <button onClick={() => setMobileSearchOpen(!mobileSearchOpen)} className="sm:hidden p-2 rounded-lg hover:bg-steel-50 text-steel-500">
+          {mobileSearchOpen ? <X size={18} /> : <Search size={18} />}
+        </button>
+
         {/* Notifications */}
         <div ref={notifRef} className="relative">
           <button
@@ -88,7 +108,7 @@ export function TopBar() {
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
           </button>
           {notifOpen && (
-            <div className="absolute right-0 top-full mt-1 w-80 bg-white border border-steel-200 rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 top-full mt-1 w-72 sm:w-80 bg-white border border-steel-200 rounded-lg shadow-lg z-50">
               <div className="px-4 py-3 border-b border-steel-100">
                 <p className="text-sm font-semibold text-navy-900">Notifications</p>
               </div>
@@ -104,11 +124,8 @@ export function TopBar() {
           )}
         </div>
 
-        {/* Company & User */}
-        <div className="hidden lg:flex items-center gap-2 pl-3 border-l border-steel-200">
-          <span className="text-xs text-steel-400">OMUSIBA Engineering & Suppliers Ltd</span>
-        </div>
-        <div className="flex items-center gap-2">
+        {/* User */}
+        <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-steel-200">
           <Avatar name="Tsindikai Mudemba" size="sm" />
           <div className="hidden md:block">
             <p className="text-xs font-medium text-navy-900 leading-tight">Tsindikai Mudemba</p>
@@ -116,6 +133,37 @@ export function TopBar() {
           </div>
         </div>
       </div>
+
+      {/* Mobile search bar - slides down */}
+      {mobileSearchOpen && (
+        <div className="absolute left-0 right-0 top-14 bg-white border-b border-steel-200 p-3 sm:hidden z-40">
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel-400" />
+            <input
+              type="text"
+              placeholder="Search..."
+              autoFocus
+              className="w-full pl-9 pr-3 py-2.5 text-sm bg-steel-50 border border-steel-200 rounded-lg placeholder-steel-400 focus:outline-none focus:ring-2 focus:ring-navy-200 focus:bg-white"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+          </div>
+          {results.length > 0 && (
+            <div className="mt-2 bg-white border border-steel-200 rounded-lg overflow-hidden">
+              {results.map((r, i) => (
+                <button
+                  key={i}
+                  className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-steel-50 text-left"
+                  onClick={() => handleSelect(r.path)}
+                >
+                  <span className="text-navy-900 font-medium">{r.label}</span>
+                  <span className="text-xs text-steel-400">{r.type}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }

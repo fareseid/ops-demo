@@ -31,18 +31,18 @@ export function QuotationDetail() {
       </div>
 
       {/* Header */}
-      <div className="bg-white rounded-lg border border-steel-200 p-6 mb-6">
-        <div className="flex items-start justify-between">
+      <div className="bg-white rounded-lg border border-steel-200 p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-semibold text-navy-900">{q.id}</h1>
+              <h1 className="text-lg sm:text-xl font-semibold text-navy-900">{q.id}</h1>
               <StatusBadge status={q.status} />
             </div>
-            <p className="text-lg text-navy-800 mt-1">{q.customer}</p>
+            <p className="text-base sm:text-lg text-navy-800 mt-1">{q.customer}</p>
             <p className="text-sm text-steel-500 mt-0.5">{q.project}</p>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-navy-900">{formatCurrency(grandTotal)}</p>
+          <div className="sm:text-right">
+            <p className="text-xl sm:text-2xl font-bold text-navy-900">{formatCurrency(grandTotal)}</p>
             <p className="text-xs text-steel-400 mt-1">incl. VAT ({(q.vat * 100).toFixed(0)}%)</p>
           </div>
         </div>
