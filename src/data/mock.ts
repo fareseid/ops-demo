@@ -35,6 +35,7 @@ export interface QuotationLineItem {
 export interface Quotation {
   id: string;
   requestId?: string;
+  projectId?: string;
   customer: string;
   project: string;
   amount: number;
@@ -47,11 +48,15 @@ export interface Quotation {
   deliveryTimeframe: string;
   lineItems: QuotationLineItem[];
   vat: number;
+  notes?: string;
 }
 
 export interface ProjectTask {
   name: string;
   status: 'Complete' | 'In Progress' | 'Not Started';
+  assignedTo?: string;
+  dueDate?: string;
+  priority?: 'Low' | 'Normal' | 'Medium' | 'High' | 'Urgent';
 }
 
 export interface ProjectMaterial {
@@ -60,7 +65,8 @@ export interface ProjectMaterial {
   available: number;
   ordered: number;
   unit: string;
-  status: 'Available' | 'Shortage' | 'Ordered' | 'Pending';
+  notes?: string;
+  status: 'Available' | 'Low Stock' | 'Shortage' | 'Ordered' | 'Pending';
 }
 
 export interface ProjectTeamMember {
@@ -106,6 +112,8 @@ export interface PurchaseRequest {
   value: number;
   requiredBy: string;
   status: ProcurementStatus;
+  poNumber?: string;
+  notes?: string;
 }
 
 export interface InventoryItem {
@@ -116,12 +124,13 @@ export interface InventoryItem {
   reserved: number;
   unit: string;
   reorderLevel: number;
-  status: 'Available' | 'Low Stock' | 'Shortage';
+  status: 'Available' | 'Low Stock' | 'Shortage' | 'Out of Stock';
 }
 
 export interface Equipment {
   name: string;
   type: string;
+  identifier?: string;
   availability: 'Available' | 'In Use' | 'Maintenance';
   currentAssignment: string;
   nextAvailable: string;
@@ -141,13 +150,14 @@ export interface Invoice {
   customer: string;
   projectId?: string;
   project: string;
+  description?: string;
   invoiceDate: string;
   dueDate: string;
   amount: number;
   paid: number;
   balance: number;
   status: InvoiceStatus;
-  payments: { date: string; amount: number; method: string; reference: string; }[];
+  payments: { date: string; amount: number; method: string; reference: string; notes?: string; }[];
 }
 
 export interface DocFile {
@@ -156,6 +166,7 @@ export interface DocFile {
   project: string;
   date: string;
   size: string;
+  description?: string;
 }
 
 // ========== DATA ==========
@@ -441,7 +452,7 @@ export const purchaseRequests: PurchaseRequest[] = [
       { description: 'Ducting Material Set', qty: '1 lot' },
       { description: 'Insulation Material', qty: '40 sqm' },
     ],
-    value: 128500, requiredBy: '2026-09-05', status: 'PO Issued',
+    value: 128500, requiredBy: '2026-09-05', status: 'PO Issued', poNumber: 'PO-2026-027',
   },
   {
     id: 'PR-2026-022', projectId: 'PRJ-2026-016', project: 'Hydraulic System Overhaul',
@@ -450,7 +461,7 @@ export const purchaseRequests: PurchaseRequest[] = [
       { description: 'Hydraulic Hose 1"', qty: '16 metres' },
       { description: 'Hydraulic Seal Kits', qty: '4 sets' },
     ],
-    value: 18600, requiredBy: '2026-08-28', status: 'Received',
+    value: 18600, requiredBy: '2026-08-28', status: 'Received', poNumber: 'PO-2026-026',
   },
   {
     id: 'PR-2026-021', projectId: 'PRJ-2026-018', project: 'Electrical Panel Upgrade',
@@ -458,7 +469,7 @@ export const purchaseRequests: PurchaseRequest[] = [
     items: [
       { description: 'Electrical Control Panel 400A', qty: '1 unit' },
     ],
-    value: 68000, requiredBy: '2026-09-05', status: 'PO Issued',
+    value: 68000, requiredBy: '2026-09-05', status: 'PO Issued', poNumber: 'PO-2026-028',
   },
 ];
 
