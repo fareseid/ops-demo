@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, Menu, X } from 'lucide-react';
-import { Avatar } from './ui';
+import { Search, Bell, Menu, X, ChevronDown, RotateCcw, LogOut } from 'lucide-react';
+import { Avatar, ConfirmDialog } from './ui';
 import { notifications } from '@/data/mock';
-import { cn } from '@/lib/utils';
+import { useAppState } from '@/hooks/useAppState';
 
 const searchIndex = [
   { label: 'Copperbelt Mining Services', type: 'Customer', path: '/requests' },
@@ -31,9 +31,13 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifOpen, setNotifOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const { resetDemo, addToast } = useAppState();
   const navigate = useNavigate();
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
 
   const results = searchQuery.length > 1
     ? searchIndex.filter(s => s.label.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6)
@@ -43,6 +47,7 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
     const handler = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchOpen(false);
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
+      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -125,14 +130,47 @@ export function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
         </div>
 
         {/* User */}
-        <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-steel-200">
-          <Avatar name="Tsindikai Mudemba" size="sm" />
-          <div className="hidden md:block">
-            <p className="text-xs font-medium text-navy-900 leading-tight">Tsindikai Mudemba</p>
-            <p className="text-[10px] text-steel-400 leading-tight">Managing Director</p>
-          </div>
+        <div ref={userRef} className="relative pl-2 sm:pl-3 border-l border-steel-200">
+          <button onClick={() => setUserOpen(o => !o)} className="flex items-center gap-2 rounded-lg hover:bg-steel-50 py-1 px-1">
+            <Avatar name="Tsindikai Mudemba" size="sm" />
+            <div className="hidden md:block text-left">
+              <p className="text-xs font-medium text-navy-900 leading-tight">Tsindikai Mudemba</p>
+              <p className="text-[10px] text-steel-400 leading-tight">Managing Director</p>
+            </div>
+            <ChevronDown size={14} className="text-steel-400 hidden md:block" />
+          </button>
+          {userOpen && (
+            <div className="absolute right-0 top-full mt-1 w-60 bg-white border border-steel-200 rounded-lg shadow-lg z-50 overflow-hidden">
+              <div className="px-4 py-3 border-b border-steel-100">
+                <p className="text-sm font-semibold text-navy-900">Tsindikai Mudemba</p>
+                <p className="text-xs text-steel-400">Managing Director</p>
+              </div>
+              <div className="px-2 py-1.5 border-b border-steel-100">
+                <p className="px-2 py-1 text-[10px] font-semibold text-steel-400 uppercase tracking-wider">Demo Settings</p>
+                <button
+                  onClick={() => { setUserOpen(false); setConfirmReset(true); }}
+                  className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-navy-800 hover:bg-steel-50 text-left"
+                >
+                  <RotateCcw size={15} className="text-steel-400" /> Reset Demo Data
+                </button>
+              </div>
+              <button onClick={() => { setUserOpen(false); addToast('This is a demo — sign out is disabled.', 'info'); }} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-steel-500 hover:bg-steel-50 text-left">
+                <LogOut size={15} className="text-steel-400" /> Sign out
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmReset}
+        title="Reset demo data?"
+        message="This restores the original demo dataset and discards any records you created in this browser."
+        confirmLabel="Reset"
+        danger={false}
+        onConfirm={() => { resetDemo(); setConfirmReset(false); addToast('Demo data has been reset.'); navigate('/'); }}
+        onCancel={() => setConfirmReset(false)}
+      />
 
       {/* Mobile search bar - slides down */}
       {mobileSearchOpen && (

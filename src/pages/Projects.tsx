@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '@/hooks/useAppState';
-import { PageHeader, StatusBadge, Button, SearchInput, SelectFilter, ProgressBar, Avatar } from '@/components/ui';
-import { Plus, Eye } from 'lucide-react';
-import { formatCurrency, formatDateShort } from '@/lib/utils';
+import { PageHeader, StatusBadge, Button, SearchInput, SelectFilter, ProgressBar, Avatar, EmptyState } from '@/components/ui';
+import { Plus, ChevronRight, MapPin } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 export function Projects() {
   const { projects } = useAppState();
@@ -27,7 +27,7 @@ export function Projects() {
       <PageHeader
         title="Projects & Jobs"
         subtitle="Active and completed projects"
-        actions={<Button><Plus size={15} /> New Project</Button>}
+        actions={<Button onClick={() => navigate('/projects/new')}><Plus size={15} /> New Project</Button>}
       />
 
       <div className="flex flex-wrap gap-3 mb-4">
@@ -36,7 +36,7 @@ export function Projects() {
         <SelectFilter value={categoryFilter} onChange={setCategoryFilter} options={categories} placeholder="All Categories" />
       </div>
 
-      <div className="bg-white rounded-lg border border-steel-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-lg border border-steel-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -75,17 +75,39 @@ export function Projects() {
                     </div>
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
-                  <td className="px-4 py-3">
-                    <button className="text-steel-400 hover:text-navy-700"><Eye size={15} /></button>
-                  </td>
+                  <td className="px-4 py-3"><ChevronRight size={15} className="text-steel-400" /></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {filtered.length === 0 && <EmptyState message="No projects found." />}
         <div className="px-4 py-3 text-xs text-steel-400 border-t border-steel-100">
           Showing {filtered.length} of {projects.length} projects
         </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {filtered.length === 0 && <div className="bg-white rounded-lg border border-steel-200"><EmptyState message="No projects found." /></div>}
+        {filtered.map(p => (
+          <button key={p.id} onClick={() => navigate(`/projects/${p.id}`)} className="w-full text-left bg-white rounded-lg border border-steel-200 p-4 active:bg-steel-50">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold text-steel-500">{p.id}</span>
+              <StatusBadge status={p.status} />
+            </div>
+            <p className="text-sm font-semibold text-navy-900 mt-1">{p.project}</p>
+            <p className="text-sm text-steel-600">{p.customer}</p>
+            <div className="flex items-center justify-between gap-2 mt-2">
+              <span className="flex items-center gap-1 text-xs text-steel-500"><MapPin size={12} /> {p.location || '—'}</span>
+              <span className="text-sm font-semibold text-navy-900">{formatCurrency(p.value)}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-2.5">
+              <ProgressBar value={p.progress} className="flex-1" />
+              <span className="text-xs text-steel-500 w-9 text-right">{p.progress}%</span>
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );

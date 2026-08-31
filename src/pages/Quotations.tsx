@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppState } from '@/hooks/useAppState';
-import { PageHeader, StatusBadge, Button, SearchInput, SelectFilter, Avatar } from '@/components/ui';
-import { Plus, Eye } from 'lucide-react';
+import { PageHeader, StatusBadge, Button, SearchInput, SelectFilter, Avatar, EmptyState } from '@/components/ui';
+import { Plus, ChevronRight } from 'lucide-react';
 import { formatCurrency, formatDateShort } from '@/lib/utils';
 
 export function Quotations() {
@@ -23,7 +23,7 @@ export function Quotations() {
       <PageHeader
         title="Quotations"
         subtitle="Manage quotations and proposals"
-        actions={<Button><Plus size={15} /> Create Quotation</Button>}
+        actions={<Button onClick={() => navigate('/quotations/new')}><Plus size={15} /> Create Quotation</Button>}
       />
 
       <div className="flex flex-wrap gap-3 mb-4">
@@ -31,7 +31,7 @@ export function Quotations() {
         <SelectFilter value={statusFilter} onChange={setStatusFilter} options={statuses} placeholder="All Statuses" />
       </div>
 
-      <div className="bg-white rounded-lg border border-steel-200 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-lg border border-steel-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -63,17 +63,35 @@ export function Quotations() {
                     </div>
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={q.status} /></td>
-                  <td className="px-4 py-3">
-                    <button className="text-steel-400 hover:text-navy-700"><Eye size={15} /></button>
-                  </td>
+                  <td className="px-4 py-3"><ChevronRight size={15} className="text-steel-400" /></td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {filtered.length === 0 && <EmptyState message="No quotations found." />}
         <div className="px-4 py-3 text-xs text-steel-400 border-t border-steel-100">
           Showing {filtered.length} of {quotations.length} quotations
         </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {filtered.length === 0 && <div className="bg-white rounded-lg border border-steel-200"><EmptyState message="No quotations found." /></div>}
+        {filtered.map(q => (
+          <button key={q.id} onClick={() => navigate(`/quotations/${q.id}`)} className="w-full text-left bg-white rounded-lg border border-steel-200 p-4 active:bg-steel-50">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold text-steel-500">{q.id}</span>
+              <StatusBadge status={q.status} />
+            </div>
+            <p className="text-sm font-semibold text-navy-900 mt-1">{q.customer}</p>
+            <p className="text-sm text-steel-600">{q.project}</p>
+            <div className="flex items-center justify-between gap-2 mt-2.5">
+              <span className="text-sm font-semibold text-navy-900">{formatCurrency(q.amount)}</span>
+              <span className="text-xs text-steel-400">Valid {formatDateShort(q.validUntil)}</span>
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );

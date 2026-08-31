@@ -1,5 +1,5 @@
 import { cn, getInitials } from '@/lib/utils';
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 
 // Status Badge
 const statusColors: Record<string, string> = {
@@ -37,6 +37,7 @@ const statusColors: Record<string, string> = {
   'Available': 'bg-emerald-50 text-emerald-700 border-emerald-200',
   'Low Stock': 'bg-amber-50 text-amber-700 border-amber-200',
   'Shortage': 'bg-red-50 text-red-700 border-red-200',
+  'Out of Stock': 'bg-red-50 text-red-700 border-red-200',
   'Ordered': 'bg-blue-50 text-blue-700 border-blue-200',
   'Pending': 'bg-steel-100 text-steel-600 border-steel-200',
   // Priority
@@ -243,5 +244,101 @@ export function SelectFilter({ value, onChange, options, placeholder }: { value:
       <option value="">{placeholder}</option>
       {options.map(o => <option key={o} value={o}>{o}</option>)}
     </select>
+  );
+}
+
+// ========== FORM PRIMITIVES ==========
+
+export const inputClass = 'w-full px-3 py-2.5 text-sm border border-steel-200 rounded-lg bg-white text-navy-900 placeholder-steel-400 focus:outline-none focus:ring-2 focus:ring-navy-200 focus:border-navy-400 disabled:bg-steel-50 disabled:text-steel-400';
+
+// Field wrapper with label / required marker / error / hint
+export function FormField({ label, required, error, hint, children, className }: {
+  label?: string; required?: boolean; error?: string; hint?: string; children: React.ReactNode; className?: string;
+}) {
+  return (
+    <div className={className}>
+      {label && (
+        <label className="block text-xs font-semibold text-steel-600 mb-1.5">
+          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+      )}
+      {children}
+      {error ? (
+        <p className="text-xs text-red-600 mt-1">{error}</p>
+      ) : hint ? (
+        <p className="text-xs text-steel-400 mt-1">{hint}</p>
+      ) : null}
+    </div>
+  );
+}
+
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean };
+export function Input({ invalid, className, ...props }: InputProps) {
+  return <input {...props} className={cn(inputClass, invalid && 'border-red-300 focus:ring-red-200', className)} />;
+}
+
+type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean };
+export function Textarea({ invalid, className, rows = 3, ...props }: TextareaProps) {
+  return <textarea rows={rows} {...props} className={cn(inputClass, 'resize-y', invalid && 'border-red-300 focus:ring-red-200', className)} />;
+}
+
+type Opt = string | { value: string; label: string };
+export function FormSelect({ value, onChange, options, placeholder, invalid, disabled, className }: {
+  value: string; onChange: (v: string) => void; options: Opt[]; placeholder?: string; invalid?: boolean; disabled?: boolean; className?: string;
+}) {
+  return (
+    <select
+      value={value}
+      disabled={disabled}
+      onChange={e => onChange(e.target.value)}
+      className={cn(inputClass, 'appearance-none bg-no-repeat', invalid && 'border-red-300 focus:ring-red-200', !value && placeholder && 'text-steel-400', className)}
+      style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23687591' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")", backgroundPosition: 'right 0.65rem center', paddingRight: '2rem' }}
+    >
+      {placeholder && <option value="">{placeholder}</option>}
+      {options.map(o => {
+        const val = typeof o === 'string' ? o : o.value;
+        const label = typeof o === 'string' ? o : o.label;
+        return <option key={val} value={val}>{label}</option>;
+      })}
+    </select>
+  );
+}
+
+// Sticky footer action bar for forms (mobile-friendly)
+export function FormActions({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-end gap-2 pt-4 mt-2 border-t border-steel-100 sticky bottom-0 bg-white pb-1">
+      {children}
+    </div>
+  );
+}
+
+// Confirmation dialog (always centered)
+export function ConfirmDialog({ open, title, message, confirmLabel = 'Delete', cancelLabel = 'Cancel', danger = true, onConfirm, onCancel }: {
+  open: boolean; title: string; message: string; confirmLabel?: string; cancelLabel?: string; danger?: boolean;
+  onConfirm: () => void; onCancel: () => void;
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-black/40" onClick={onCancel} />
+      <div className="relative bg-white w-full max-w-sm rounded-xl shadow-2xl p-5">
+        <div className="flex gap-3">
+          {danger && (
+            <div className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle size={18} className="text-red-600" />
+            </div>
+          )}
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-navy-900">{title}</h3>
+            <p className="text-sm text-steel-500 mt-1">{message}</p>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 mt-5">
+          <Button variant="secondary" size="sm" onClick={onCancel}>{cancelLabel}</Button>
+          <Button variant={danger ? 'danger' : 'primary'} size="sm" onClick={onConfirm}>{confirmLabel}</Button>
+        </div>
+      </div>
+    </div>
   );
 }
